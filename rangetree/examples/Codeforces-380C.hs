@@ -17,4 +17,4 @@ main = do
     let rt :: SRangeTree Int Value
         rt = fromList s
     queries <- unfoldr (\a -> if null a then Nothing else Just $ splitAt 2 a) . map read . tail . words <$> getContents
-    putStrLn $ unlines $ map (\[l, r] -> let Value (ans, _, _) = fst $ query (l - 1, r) rt in show ans) queries
+    putStrLn $ unlines $ map (\[l, r] -> let Value (ans, _, _) = query (l - 1, r) rt in show ans) queries

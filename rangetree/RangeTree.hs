@@ -11,7 +11,6 @@ module RangeTree
 ) where
 
 
-
 import Data.Function (on)
 import Data.List (genericLength)
 import Data.Monoid
@@ -63,16 +62,14 @@ fromList xs = fromList' xs (0, genericLength xs)
                 (lxs, rxs)  = splitAt (fromIntegral $ (r - l) `div` 2) xs
 
 
-query :: Node n i a => (i, i) -> RangeTree n i a -> (a, RangeTree n i a)
+query :: Node n i a => (i, i) -> RangeTree n i a -> a
 query (b, e) t
-    | e <= l || r <= b  = (mempty, t)
-    | b <= l && r <= e  = (getValue n, t)
+    | e <= l || r <= b  = mempty
+    | b <= l && r <= e  = getValue n
     | otherwise         =
         let Deep _ lt rt    = t
             (lt', rt')      = (on (,) $ \t' -> replaceRoot (propagate n $ getRoot t') t') lt rt
-            (lans, lt'')    = query (b, e) lt'
-            (rans, rt'')    = query (b, e) rt'
-        in  (lans <> rans, merge lt'' rt'')
+        in  (on (<>) $ query (b, e)) lt' rt'
     where
         n       = getRoot t
         (l, r)  = getBounds n
